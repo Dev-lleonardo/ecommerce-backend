@@ -21,20 +21,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-
+                // Desabilita CSRF, essencial para APIs REST que usam JWT
                 .csrf(AbstractHttpConfigurer::disable)
+
+                // Configura a autenticação como STATELESS (sem estado), pois usaremos Tokens
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
+                // Define as regras de permissão das rotas
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/api/auth/**",    // ADICIONADO O PREFIXO /api PARA BATER COM O POSTMAN
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        ).permitAll()              // Estas rotas não precisam de Token
+                        .anyRequest().authenticated() // Qualquer outra rota exige login
                 )
+
+                // Adiciona seu filtro JWT antes do filtro padrão de usuário/senha
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
