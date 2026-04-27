@@ -1,4 +1,4 @@
-package com.seuprojeto.ecommerce.auth.auth;
+package com.seuprojeto.ecommerce.auth;
 
 import com.seuprojeto.ecommerce.auth.dto.LoginRequestDTO;
 import com.seuprojeto.ecommerce.auth.dto.LoginResponseDTO;
@@ -31,5 +31,3 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(dto));
     }
 }
-
-

@@ -1,4 +1,4 @@
-package com.seuprojeto.ecommerce.auth.auth;
+package com.seuprojeto.ecommerce.auth;
 
 import com.seuprojeto.ecommerce.auth.dto.LoginRequestDTO;
 import com.seuprojeto.ecommerce.auth.dto.LoginResponseDTO;
@@ -6,8 +6,8 @@ import com.seuprojeto.ecommerce.auth.dto.RegisterRequestDTO;
 import com.seuprojeto.ecommerce.exception.BusinessException;
 import com.seuprojeto.ecommerce.role.Role;
 import com.seuprojeto.ecommerce.role.RoleRepository;
-import com.seuprojeto.ecommerce.security.JwtService;
 import com.seuprojeto.ecommerce.security.CustomUserDetailsService;
+import com.seuprojeto.ecommerce.security.JwtService;
 import com.seuprojeto.ecommerce.user.User;
 import com.seuprojeto.ecommerce.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +63,3 @@ public class AuthService {
         return new LoginResponseDTO(token);
     }
 }
-
-
-
