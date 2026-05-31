@@ -4,8 +4,11 @@ import com.seuprojeto.ecommerce.category.dto.CategoryRequestDTO;
 import com.seuprojeto.ecommerce.category.dto.CategoryResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -16,18 +19,27 @@ public class CategoryController {
     private final CategoryService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDTO> create(
             @RequestBody CategoryRequestDTO dto
     ) {
-        return ResponseEntity.ok(service.create(dto));
+        CategoryResponseDTO created = service.create(dto);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.id())
+                .toUri();
+        return ResponseEntity.created(location).body(created);
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<CategoryResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CategoryResponseDTO> findById(
             @PathVariable Long id
     ) {
@@ -35,6 +47,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDTO> update(
             @PathVariable Long id,
             @RequestBody CategoryRequestDTO dto
@@ -43,6 +56,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable Long id
     ) {
@@ -50,4 +64,3 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 }
-
