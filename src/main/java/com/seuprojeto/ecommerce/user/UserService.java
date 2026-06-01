@@ -43,5 +43,19 @@ public class UserService {
                 user.getEmail()
         );
     }
+    public UserResponseDTO findByEmail(String email) {
+        // 1. Busca o usuário no seu UserRepository pelo email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Usuário não encontrado com o e-mail: " + email)
+                );
+
+        // 2. Converte a entidade 'User' para o 'UserResponseDTO' usando o mesmo padrão do seu return acima
+        return new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
+    }
 }
 

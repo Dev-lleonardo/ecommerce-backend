@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.ExpiredJwtException; // Certifique-se de importar a exceção
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,36 +39,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String email = jwtService.extractEmail(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            // O erro estoura aqui se o token estiver expirado
+            String email = jwtService.extractEmail(token);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (!jwtService.isTokenValid(token) || !userDetails.isEnabled()) {
-                filterChain.doFilter(request, response);
-                return;
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+                if (!jwtService.isTokenValid(token) || !userDetails.isEnabled()) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
+                List<String> roles = jwtService.extractRoles(token);
+                var authorities = roles.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                authorities
+                        );
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
-            List<String> roles = jwtService.extractRoles(token);
-            var authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList();
+            // Continua a requisição normalmente se o token estiver ok
+            filterChain.doFilter(request, response);
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            authorities
-                    );
-
-            authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (ExpiredJwtException e) {
+            // Se o token estiver expirado, barra a requisição aqui e devolve 401
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.getWriter().write("{ \"error\": \"O token enviado está expirado. Faça login novamente.\" }");
+            // NOTA: Não chamamos filterChain.doFilter aqui, interrompendo o fluxo com segurança.
         }
-
-        filterChain.doFilter(request, response);
     }
 }
