@@ -2,6 +2,7 @@ package com.seuprojeto.ecommerce.category;
 
 import com.seuprojeto.ecommerce.category.dto.CategoryRequestDTO;
 import com.seuprojeto.ecommerce.category.dto.CategoryResponseDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +22,7 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDTO> create(
-            @RequestBody CategoryRequestDTO dto
+            @RequestBody @Valid CategoryRequestDTO dto
     ) {
         CategoryResponseDTO created = service.create(dto);
         URI location = ServletUriComponentsBuilder
@@ -50,7 +51,7 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody CategoryRequestDTO dto
+            @RequestBody @Valid CategoryRequestDTO dto
     ) {
         return ResponseEntity.ok(service.update(id, dto));
     }

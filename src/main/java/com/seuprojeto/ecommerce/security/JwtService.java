@@ -2,8 +2,10 @@ package com.seuprojeto.ecommerce.security;
 
 import com.seuprojeto.ecommerce.user.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,13 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long expiration;
+
+    @PostConstruct
+    void validateSecret() {
+        if (secret == null || secret.getBytes().length < 32) {
+            throw new IllegalStateException("jwt.secret deve ter pelo menos 32 bytes");
+        }
+    }
 
     public String generateToken(User user) {
         List<String> roles = user.getAuthorities().stream()
@@ -45,7 +54,11 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
-        return !isTokenExpired(token);
+        try {
+            return !isTokenExpired(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {

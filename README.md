@@ -1,24 +1,81 @@
-# 🛒 E-commerce Backend API
+# E-commerce Backend API
 
-**Status:** 🚧 Work In Progress (WIP)
+API REST de e-commerce feita com Java 21, Spring Boot 3.2.5, Spring Security, JWT, MySQL, Flyway e Swagger/OpenAPI.
 
-A robust e-commerce REST API built with **Java 21** and **Spring Boot 3.2.5**, designed with a focus on security, scalability, and clean code principles.
+## Funcionalidades
 
-## 🚀 Technologies & Tools
-* **Language:** Java 21
-* **Framework:** Spring Boot 3.2.5
-* **Security:** Stateless Authentication with JWT (io.jsonwebtoken 0.12.6) and BCrypt
-* **Database:** MySQL
-* **Documentation:** Interactive API docs with Swagger/OpenAPI 3
-* **Architecture:** Layered pattern (Controller-Service-Repository)
+- Cadastro e login em `/auth/register` e `/auth/login`.
+- Autenticacao stateless com Bearer Token JWT.
+- Controle de acesso por roles `ROLE_USER` e `ROLE_ADMIN`.
+- CRUD de categorias e produtos para admin.
+- Consulta de categorias/produtos para usuarios autenticados.
+- Carrinho por usuario: ver, adicionar item, alterar quantidade, remover item e limpar.
+- Pedidos criados a partir do carrinho.
+- Admin pode listar todos os pedidos e confirmar pedidos.
+- Usuario comum so acessa seus proprios pedidos.
 
-## 🛠️ Current Features
-* **User Management:** Registration and authentication with Role-Based Access Control (RBAC).
-* **Data Initialization:** Automatic setup for Roles (USER/ADMIN) and a Default Admin user upon startup.
-* **Security:** Protected endpoints requiring Bearer Token validation.
+## Configuracao
 
-## 🔧 How to Run
-1. Clone the repository.
-2. Create a `.env` file based on the `.env.example` provided.
-3. Run the application via your IDE or `./mvnw spring-boot:run`.
-4. Access the interactive documentation at: `http://localhost:8080/swagger-ui.html`.
+1. Copie `.env.example` para `.env`.
+2. Troque todas as senhas e defina um `JWT_SECRET` com pelo menos 32 caracteres.
+3. Para rodar com Docker:
+
+```bash
+docker compose up --build
+```
+
+4. Para rodar pela IDE ou Maven, suba o MySQL e execute:
+
+```bash
+./mvnw spring-boot:run
+```
+
+No Windows:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+## Swagger
+
+Com a API rodando, acesse:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+Use o botao `Authorize` e informe:
+
+```text
+Bearer SEU_TOKEN_JWT
+```
+
+## Fluxo rapido de teste
+
+1. Registrar usuario em `POST /auth/register`.
+2. Fazer login em `POST /auth/login`.
+3. Fazer login com o admin configurado no `.env`.
+4. Como admin, criar categoria em `POST /categories`.
+5. Como admin, criar produto em `POST /products`.
+6. Como usuario, adicionar item em `POST /cart/items`.
+7. Como usuario, consultar carrinho em `GET /cart`.
+8. Como usuario, criar pedido em `POST /orders`.
+9. Como admin, confirmar pedido em `PATCH /orders/{id}/confirm`.
+
+## Testes
+
+```bash
+./mvnw test
+```
+
+No Windows:
+
+```bash
+mvnw.cmd test
+```
+
+## Seguranca
+
+- Nunca versione `.env` com credenciais reais.
+- Rotacione `DB_PASSWORD`, `ADMIN_PASSWORD` e `JWT_SECRET` antes de publicar ou fazer deploy.
+- Em producao, use HTTPS, CORS restrito ao dominio real e segredos gerenciados pelo ambiente.
