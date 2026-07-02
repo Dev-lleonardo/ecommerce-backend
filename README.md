@@ -1,6 +1,32 @@
-# E-commerce Backend API
+# 🛒 E-commerce Backend API
 
-API REST de e-commerce feita com Java 21, Spring Boot 3.2.5, Spring Security, JWT, MySQL, Flyway e Swagger/OpenAPI.
+API REST completa de e-commerce desenvolvida com Java 21 e Spring Boot, utilizando autenticação JWT, Spring Security, Docker, Flyway, MySQL e documentação interativa com Swagger/OpenAPI.
+
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green)
+![MySQL](https://img.shields.io/badge/MySQL-8-blue)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-black)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+## 🏗 Arquitetura
+
+Cliente
+      │
+      ▼
+Spring Boot API
+      │
+      ▼
+Spring Security + JWT
+      │
+      ▼
+Service
+      │
+      ▼
+Repository
+      │
+      ▼
+MySQL
 
 ## Funcionalidades
 
